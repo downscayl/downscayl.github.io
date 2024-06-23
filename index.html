@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Downscayl : The swiss army knife of effortless image compression</title>
+    <meta name="description" content="Streamlined image file size reduction for storage optimization by avoiding to compromise its quality.">
+    <meta name="keywords" content="image compressor, image, compressor, javascript, static, downscayl">
+    <meta name="author" content="Downscayl">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#111">
+    <meta name="msapplication-TileColor" content="#111">
+    <meta name="theme-color" content="#111">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" integrity="sha512-t4GWSVZO1eC8BM339Xd7Uphw5s17a86tIZIj8qRxhnKub6WoyhnrxeCIMeAqBPgdZGlCcG2PrZjMc+Wr78+5Xg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body.dark {
+            background-color: #111;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        #result img {
+            max-width: 100%;
+            height: auto;
+            border-style: dashed;
+            color: #32de84;
+            border-width: thick;
+            padding: 10px;
+        }
+        #compressionPlaceholder {
+            font-weight: bold;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body class="dark">
+            <div style="text-align: center; margin-top:20px;">
+                <img src="logo.jpg" alt="LOGO" width="96" height="96">
+                <h1 style="margin-bottom: 1px;">Downscayl</h1><h4 style="margin-top: 0px;">Effortless Image Compression</h4>
+    <div class="container">
+<br>
+        <div class="row">
+<div class="col-md-3">
+    <div class="form-group">
+        <h2>Step 1: Upload</h2>
+        <label for="imageInput" class="btn btn-primary">
+            Choose Image
+            <input type="file" class="form-control-file" id="imageInput" accept="image/*" style="display: none;">
+        </label>
+    </div>
+</div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <h2>Step 2: Quality</h2>
+                    <input style="margin-top: 12px;" type="range" class="form-control-range" id="quality" name="quality" min="10" max="90" value="60" oninput="updateQuality()">
+                    <output for="quality" id="qualityOutput">60</output>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <h2>Step 3: Compress</h2>
+                    <button id="compressButton" class="btn btn-primary" disabled>Compress</button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <h2>Step 4: Download</h2>
+                    <button id="downloadButton" class="btn btn-success" disabled>Download</button>
+                </div>
+            </div>
+        </div>
+
+
+ <p id="fileNameDisplay" class="mt-3 text-center">There is no selected file.</p>
+<br>
+        <div id="result" class="mt-3"></div>
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-3dZ9wIrMMij8rOH7X3kLfXAzwtcHpuYpEgQg1OA4QAob1e81H8ntUQmQm3pBudqIoySO5j0tHN4ENzA6+n2r4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        function updateQuality() {
+            var qualityOutput = document.getElementById('qualityOutput');
+            qualityOutput.value = document.getElementById('quality').value;
+        }
+
+$(document).ready(function () {
+    $('#imageInput').change(function () {
+        var file = this.files[0];
+        var compressButton = $('#compressButton');
+        var fileNameDisplay = $('#fileNameDisplay');
+
+        if (file && file.type.match('image.*')) {
+            compressButton.prop('disabled', false);
+            fileNameDisplay.text('Selected file: ' + file.name);
+        } else {
+            compressButton.prop('disabled', true);
+            fileNameDisplay.text('No file chosen');
+        }
+    });
+
+            $('#compressButton').click(function () {
+                var imageInput = document.getElementById('imageInput');
+                var quality = document.getElementById('quality').value;
+                var file = imageInput.files[0];
+
+                if (!file) {
+                    alert('Please select an image file.');
+                    return;
+                }
+
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var image = new Image();
+                    image.src = e.target.result;
+
+                    image.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var context = canvas.getContext('2d');
+
+                        var maxWidth = 800;
+                        var maxHeight = 800;
+                        var width = image.width;
+                        var height = image.height;
+
+                        if (width > height && width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        } else if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        context.drawImage(image, 0, 0, width, height);
+
+                        var compressedImageData = canvas.toDataURL('image/jpeg', quality / 100);
+
+                        var resultElement = document.getElementById('result');
+                        resultElement.innerHTML = '<h2 id="compressionPlaceholder">Processing....</h2>';
+
+                        var downloadButton = document.getElementById('downloadButton');
+                        downloadButton.disabled = true;
+
+                        setTimeout(function () {
+                            resultElement.innerHTML = '';
+                            var compressedImageElement = document.createElement('img');
+                            compressedImageElement.src = compressedImageData;
+                            resultElement.appendChild(compressedImageElement);
+                            downloadButton.disabled = false;
+                        }, 2000);
+                    };
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            $('#downloadButton').click(function () {
+                var compressedImageElement = document.querySelector('#result img');
+                if (compressedImageElement) {
+                    var a = document.createElement('a');
+                    a.href = compressedImageElement.src;
+                    var downloadFilename = getDownloadFilename(imageInput.files[0]);
+                    a.download = downloadFilename;
+
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    compressedImageElement.parentNode.removeChild(compressedImageElement);
+
+                    downloadButton.disabled = true;
+                }
+            });
+
+        });
+
+        function getDownloadFilename(file) {
+            var originalFilename = file.name;
+            var extensionIndex = originalFilename.lastIndexOf('.');
+            var filenameWithoutExtension = originalFilename.substring(0, extensionIndex);
+            var extension = originalFilename.substring(extensionIndex);
+            var newFilename = filenameWithoutExtension + '_compressed' + extension;
+
+            return newFilename;
+        }
+    </script>
+
+<footer style="text-align: center; padding: 20px; font-size: 17px; margin-top: 50px;">
+Licensed under the MIT License.<br>
+&#169;Downscayl. All Rights Reserved.
+</footer>
+</body>
+</html>
