@@ -10,6 +10,9 @@ The swiss army knife of effortless image compression
 ## Use it now!
 https://downscayl.github.io/
 
+## Screenshot
+<img src="https://downscayl.github.io/Downscayl.jpg">
+
 ## About Downscayl
 Streamlined image file size reduction for storage optimization by avoiding to compromise its quality.
 
