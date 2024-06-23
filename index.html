@@ -168,23 +168,29 @@ $(document).ready(function () {
                 reader.readAsDataURL(file);
             });
 
-            $('#downloadButton').click(function () {
-                var compressedImageElement = document.querySelector('#result img');
-                if (compressedImageElement) {
-                    var a = document.createElement('a');
-                    a.href = compressedImageElement.src;
-                    var downloadFilename = getDownloadFilename(imageInput.files[0]);
-                    a.download = downloadFilename;
+$('#downloadButton').click(function () {
+    var compressedImageElement = document.querySelector('#result img');
+    if (compressedImageElement) {
+        var a = document.createElement('a');
+        a.href = compressedImageElement.src;
+        var downloadFilename = getDownloadFilename(imageInput.files[0]);
+        a.download = downloadFilename;
 
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-                    compressedImageElement.parentNode.removeChild(compressedImageElement);
+        compressedImageElement.parentNode.removeChild(compressedImageElement);
 
-                    downloadButton.disabled = true;
-                }
-            });
+        // Reset file name display to initial state
+        $('#fileNameDisplay').text('There is no selected file.');
+
+        // Disable download button again
+        var downloadButton = document.getElementById('downloadButton');
+        downloadButton.disabled = true;
+    }
+});
+
 
         });
 
